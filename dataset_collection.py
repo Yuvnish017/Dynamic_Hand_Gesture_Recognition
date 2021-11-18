@@ -36,6 +36,7 @@ for folder in folder_list:
         os.makedirs(os.path.join(datadir, folder))
 
 gesture_name = input('Enter the name of the gesture for which you want to create the images: ')
+r = False
 
 if not os.path.exists(os.path.join(datadir, gesture_name)):
     print('Please type the correct gesture name')
@@ -55,6 +56,7 @@ else:
 
     while cap.isOpened():
         ret, frame = cap.read()
+        k = cv2.waitKey(1)
         if ret:
             frame = cv2.flip(frame, 1)
             roi = frame[0:320, 320:640]
@@ -62,7 +64,7 @@ else:
             gray = cv2.GaussianBlur(gray, (7, 7), 0)
             cv2.rectangle(frame, (320, 0), (640, 320), (0, 255, 0), 1)
             if num_frames < 200:
-                cv2.putText(frame, 'For first 30 frame do not show any hand gesture', (0, 350),
+                cv2.putText(frame, 'For first 200 frame do not show any hand gesture', (0, 350),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
                 running_avg(gray, Weight)
 
@@ -73,9 +75,17 @@ else:
                                 0.7, (0, 255, 0))
                 else:
                     cv2.imshow('hand', hand)
-                    hand = cv2.resize(hand, (128, 128))
-                    cv2.imwrite(os.path.join(datadir, str(num_images) + '.jpg'), hand)
-                    num_images += 1
+                    if k == ord('q'):
+                        r = True
+
+                    if r:
+                        if num_images % 5 == 0:
+                            hand = cv2.resize(hand, (128, 128))
+                            cv2.imwrite(os.path.join(datadir, str(num_images) + '.jpg'), hand)
+                        num_images += 1
+
+                        if num_images == 150:
+                            r = False
 
             new_frame_time = time.time()
             fps = 1/(new_frame_time - prev_frame_time)
@@ -88,7 +98,6 @@ else:
             cv2.imshow('roi', roi)
             num_frames += 1
 
-            k = cv2.waitKey(1)
             if k == 27:
                 break
 
