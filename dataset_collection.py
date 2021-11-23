@@ -29,6 +29,9 @@ def segment_hand(img, threshold=25):
 
 
 datadir = 'dataset'
+if not os.path.exists(datadir):
+    os.makedirs(datadir)
+    
 folder_list = ['ThumbsUp', 'ThumbsDown', 'LeftSwipe', 'RightSwipe',
                'SwipeUp', 'SwipeDown', 'OpeningFist', 'ClosingFist']
 for folder in folder_list:
