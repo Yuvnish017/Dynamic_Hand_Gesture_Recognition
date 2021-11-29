@@ -90,12 +90,12 @@ else:
                         if num_images == 150:
                             r = False
 
-            new_frame_time = time.time()
-            fps = 1/(new_frame_time - prev_frame_time)
-            prev_frame_time = new_frame_time
-            fps = int(fps)
-            fps = str(fps)
-            cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
+            # new_frame_time = time.time()
+            # fps = 1/(new_frame_time - prev_frame_time)
+            # prev_frame_time = new_frame_time
+            # fps = int(fps)
+            # fps = str(fps)
+            # cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
 
             cv2.imshow('frame', frame)
             cv2.imshow('roi', roi)
