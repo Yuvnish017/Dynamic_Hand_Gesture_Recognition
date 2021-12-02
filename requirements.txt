@@ -1,0 +1,7 @@
+tensorflow_cpu==2.4.1
+numpy==1.19.5
+pycaw==20181226
+screen_brightness_control==0.11.3
+comtypes==1.1.10
+opencv_python_headless==4.5.1.48
+tensorflow==2.7.0

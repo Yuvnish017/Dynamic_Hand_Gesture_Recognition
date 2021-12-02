@@ -7,6 +7,11 @@ background = None
 
 
 def running_avg(img, weight):
+    """
+    for running average calculation of background
+    :param img: current background image
+    :param weight: weight for the current image
+    """
     global background
     if background is None:
         background = img.copy().astype(np.float)
@@ -16,31 +21,38 @@ def running_avg(img, weight):
 
 
 def segment_hand(img, threshold=25):
+    """
+    for hand segmentation from the image
+    :param img: input image
+    :param threshold: value of threshold for segmentation
+    :return: thresholded image
+    """
     global background
-    # print(background.shape)
-    # print(img.shape)
     diff = cv2.absdiff(background.astype(np.uint8), img)
     threshold_image = cv2.threshold(diff, threshold, 255, cv2.THRESH_BINARY)[1]
     _, contours = cv2.findContours(threshold_image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # print(type(contours))
     if contours is None:
         return None
     return threshold_image
 
 
+# dataset directory path
 datadir = 'dataset'
 if not os.path.exists(datadir):
     os.makedirs(datadir)
     
+# names of folders/classes inside dataset directory
 folder_list = ['ThumbsUp', 'ThumbsDown', 'LeftSwipe', 'RightSwipe',
                'SwipeUp', 'SwipeDown', 'OpeningFist', 'ClosingFist']
 for folder in folder_list:
     if not os.path.exists(os.path.join(datadir, folder)):
         os.makedirs(os.path.join(datadir, folder))
 
+# manually input the gesture name for which images needs to be saved
 gesture_name = input('Enter the name of the gesture for which you want to create the images: ')
 r = False
 
+# check if correct gesture name has been given
 if not os.path.exists(os.path.join(datadir, gesture_name)):
     print('Please type the correct gesture name')
 
@@ -50,7 +62,7 @@ else:
     os.makedirs(os.path.join(datadir, str(n + 1)))
     datadir = os.path.join(datadir, str(n + 1))
 
-    Weight = 0.5
+    Weight = 0.5  # weight for running average calculation of background
     cap = cv2.VideoCapture(0)
     num_frames = 0
     num_images = 0
@@ -66,18 +78,24 @@ else:
             gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(gray, (7, 7), 0)
             cv2.rectangle(frame, (320, 0), (640, 320), (0, 255, 0), 1)
+
+            # check if num of frames are less than 200 or not
+            # if yes then use running average function for background calculation
             if num_frames < 200:
                 cv2.putText(frame, 'For first 200 frame do not show any hand gesture', (0, 350),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
                 running_avg(gray, Weight)
 
             else:
+                # get the segmented hand
                 hand = segment_hand(gray)
                 if hand is None:
                     cv2.putText(frame, 'No hand gesture showed up on the screen', (0, 350), cv2.FONT_HERSHEY_SIMPLEX,
                                 0.7, (0, 255, 0))
                 else:
                     cv2.imshow('hand', hand)
+
+                    # press q button to start saving images for the gesture
                     if k == ord('q'):
                         r = True
 
